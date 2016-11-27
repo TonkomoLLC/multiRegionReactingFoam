@@ -220,4 +220,5 @@ forAll(fluidRegions, i)
 		
     fieldsFluid[i].add(reactionFluid[i].thermo().he());
     
+    turbulence[i].validate();
 }
