@@ -12,7 +12,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
 
 {
     reaction.correct();
-    dQ = reaction.dQ();
+    Qdot = reaction.Qdot();
     label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
 

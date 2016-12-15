@@ -6,7 +6,7 @@ PtrList<surfaceScalarField> phiFluid(fluidRegions.size());
 PtrList<uniformDimensionedVectorField> gFluid(fluidRegions.size());
 PtrList<compressible::turbulenceModel> turbulence(fluidRegions.size());
 PtrList<radiation::radiationModel> radiation(fluidRegions.size());
-PtrList<volScalarField> dQFluid(fluidRegions.size());
+PtrList<volScalarField> QdotFluid(fluidRegions.size());
 List<scalar> initialMassFluid(fluidRegions.size());
 List<bool> frozenFlowFluid(fluidRegions.size(), false);
 
@@ -120,25 +120,25 @@ forAll(fluidRegions, i)
         ).ptr()
     );
 
-   Info<< "    Adding to dQ\n" << endl;
-   dQFluid.set
+   Info<< "    Adding to Qdot\n" << endl;
+   QdotFluid.set
    (
         i,
         new volScalarField
         (
             IOobject
             (
-                "dQ",
+                "Qdot",
                 runTime.timeName(),
                 fluidRegions[i],
-                IOobject::NO_READ,
+                IOobject::READ_IF_PRESENT,
                 IOobject::AUTO_WRITE
             ),
                 fluidRegions[i],
                 dimensionedScalar
             (
-                "dQ",
-                dimEnergy/dimTime,
+                "Qdot",
+                dimEnergy/dimVolume/dimTime,
                 0
             )
         )

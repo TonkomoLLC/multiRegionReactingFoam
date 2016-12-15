@@ -15,7 +15,7 @@
 
     volScalarField& p = thermo.p();
     const volScalarField& psi = thermo.psi();
-    volScalarField& dQ = dQFluid[i];
+    volScalarField& Qdot = QdotFluid[i];
 
     const dimensionedVector& g = gFluid[i];
 
