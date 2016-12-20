@@ -21,6 +21,9 @@ PtrList<dimensionedScalar> rhoMin(fluidRegions.size());
 PtrList<IOMRFZoneList> MRFfluid(fluidRegions.size());
 PtrList<fv::options> fluidFvOptions(fluidRegions.size());
 
+
+#include "createRDeltaT.H"
+
 // Populate fluid field pointer lists
 forAll(fluidRegions, i)
 {
@@ -279,3 +282,5 @@ forAll(fluidRegions, i)
 
     turbulence[i].validate();    
 }
+
+
