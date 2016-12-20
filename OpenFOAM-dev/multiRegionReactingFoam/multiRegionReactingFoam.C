@@ -72,7 +72,6 @@ int main(int argc, char *argv[])
 
     #include "initContinuityErrs.H"
     #include "createTimeControls.H"
-    #include "createRDeltaT.H"
     #include "readSolidTimeControls.H"
     
     #include "compressibleMultiRegionCourantNo.H"
