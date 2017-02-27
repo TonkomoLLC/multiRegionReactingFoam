@@ -20,6 +20,7 @@ EXE_INC = \
     -I$(LIB_SRC)/ODE/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude
 
+
 EXE_LIBS = \
     -lfiniteVolume \
     -lcompressibleTransportModels \
@@ -28,13 +29,17 @@ EXE_LIBS = \
     -lspecie \
     -lchemistryModel \
     -lODE \
+    -lmeshTools \
     -lcombustionModels \
     -lturbulenceModels \
     -lcompressibleTurbulenceModels \
     -lradiationModels \
     -lfvOptions \
     -lregionModels \
+    -lthermophysicalFunctions \
+    -lreactionThermophysicalModels \
     -lsampling
-    
+
+
     
    
