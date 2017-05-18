@@ -122,11 +122,11 @@ U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
-//if (pressureControl.limit(p))
-//{
+if (pressureControl.limit(p))
+{
     p.correctBoundaryConditions();
     rho = thermo.rho();
-//}
+}
 
 if (thermo.dpdt())
 {
