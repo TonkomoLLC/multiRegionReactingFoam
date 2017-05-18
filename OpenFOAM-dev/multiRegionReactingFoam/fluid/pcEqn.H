@@ -1,7 +1,4 @@
 rho = thermo.rho();
-rho = max(rho, rhoMin[i]);
-rho = min(rho, rhoMax[i]);
-rho.relax();
 
 volScalarField rAU(1.0/UEqn.A());
 volScalarField rAtU(1.0/(1.0/rAU - UEqn.H1()));
@@ -64,7 +61,6 @@ if (transonic)
                     )
                 )
             );
-
 
         if (nonOrth == nNonOrthCorr)
         {
@@ -130,6 +126,7 @@ else
 }
 
 #include "rhoEqn.H"
+//#include "compressibleContinuityErrs.H"
 #include "compressibleContinuityErrors.H"
 
 // Explicitly relax pressure for momentum corrector
@@ -140,20 +137,13 @@ U.correctBoundaryConditions();
 fvOptions.correct(U);
 K = 0.5*magSqr(U);
 
+//if (pressureControl.limit(p))
+//{
+    p.correctBoundaryConditions();
+    rho = thermo.rho();
+//}
+
 if (thermo.dpdt())
 {
     dpdt = fvc::ddt(p);
 }
-
-// Recalculate density from the relaxed pressure
-rho = thermo.rho();
-rho = max(rho, rhoMin[i]);
-rho = min(rho, rhoMax[i]);
-rho.relax();
-
-if (!transonic)
-{
-    rho.relax();
-}
-
-Info<< "rho max/min : " << max(rho).value() << " " << min(rho).value() << endl;
