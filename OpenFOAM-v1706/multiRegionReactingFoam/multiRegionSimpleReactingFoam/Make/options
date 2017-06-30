@@ -32,11 +32,12 @@ EXE_LIBS = \
     -lmeshTools \
     -lcombustionModels \
     -lturbulenceModels \
-    -lreactionThermophysicalModels \
     -lcompressibleTurbulenceModels \
     -lradiationModels \
     -lfvOptions \
     -lregionModels \
+    -lthermophysicalProperties \
+    -lreactionThermophysicalModels \
     -lsampling
 
 

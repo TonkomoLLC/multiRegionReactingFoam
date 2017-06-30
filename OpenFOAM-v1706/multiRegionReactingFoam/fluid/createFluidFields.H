@@ -15,9 +15,6 @@ List<scalar> initialMassFluid(fluidRegions.size());
 List<bool> frozenFlowFluid(fluidRegions.size(), false);
 PtrList<multivariateSurfaceInterpolationScheme<scalar>::fieldTable> fieldsFluid(fluidRegions.size());
 
-PtrList<dimensionedScalar> rhoMax(fluidRegions.size());
-PtrList<dimensionedScalar> rhoMin(fluidRegions.size());
-
 PtrList<IOMRFZoneList> MRFfluid(fluidRegions.size());
 PtrList<fv::options> fluidFvOptions(fluidRegions.size());
 
@@ -214,36 +211,6 @@ forAll(fluidRegions, i)
     const dictionary& pimpleDict =
         fluidRegions[i].solutionDict().subDict("PIMPLE");
     pimpleDict.readIfPresent("frozenFlow", frozenFlowFluid[i]);
-
-    rhoMax.set
-    (
-        i,
-        new dimensionedScalar
-        (
-            dimensionedScalar::lookupOrDefault
-            (
-                "rhoMax",
-                pimpleDict,
-                dimDensity,
-                GREAT
-            )
-        )
-    );
-
-    rhoMin.set
-    (
-        i,
-        new dimensionedScalar
-        (
-            dimensionedScalar::lookupOrDefault
-            (
-                "rhoMin",
-                pimpleDict,
-                dimDensity,
-                0
-            )
-        )
-    );
 
 
     Info<< "    Adding MRF\n" << endl;

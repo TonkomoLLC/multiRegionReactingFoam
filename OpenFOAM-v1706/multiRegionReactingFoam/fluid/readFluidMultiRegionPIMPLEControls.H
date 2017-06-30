@@ -14,3 +14,8 @@
         
     const bool consistent =
         pimple.lookupOrDefault("consistent", false);
+        
+//    pressureControl pressureControl(p, rho, pimple.dict(), false);
+    pressureControl pressureControl(p, rho, mesh.solutionDict().subDict("PIMPLE"), false);
+ 
+

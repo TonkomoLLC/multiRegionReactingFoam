@@ -42,6 +42,7 @@ Description
 #include "fixedGradientFvPatchFields.H"
 #include "regionProperties.H"
 #include "pimpleControl.H"
+#include "pressureControl.H"
 #include "compressibleCourantNo.H"
 #include "solidRegionDiffNo.H"
 #include "solidThermo.H"
@@ -123,6 +124,7 @@ int main(int argc, char *argv[])
                 #include "setRegionFluidFields.H"
                 #include "readFluidMultiRegionPIMPLEControls.H"
                 #include "solveFluid.H"
+                rho = thermo.rho();
             }
 
             forAll(solidRegions, i)
@@ -135,6 +137,7 @@ int main(int argc, char *argv[])
             }
 
         }
+        
 
         runTime.write();
 
