@@ -2,11 +2,12 @@
     PtrList<coordinateSystem> coordinates(solidRegions.size());
     PtrList<solidThermo> thermos(solidRegions.size());
     PtrList<radiation::radiationModel> radiations(solidRegions.size());
-//    PtrList<fv::IOoptionList> solidHeatSources(solidRegions.size());
-// OF4 Update
     PtrList<fv::options> solidHeatSources(solidRegions.size());
     PtrList<volScalarField> betavSolid(solidRegions.size());
     PtrList<volSymmTensorField> aniAlphas(solidRegions.size());
+
+    List<bool> residualReachedSolid(solidRegions.size(), true);
+    List<bool> residualControlUsedSolid(solidRegions.size(), false);
 
     // Populate solid field pointer lists
     forAll(solidRegions, i)
@@ -21,7 +22,6 @@
         radiations.set(i, radiation::radiationModel::New(thermos[i].T()));
 
         Info<< "    Adding fvOptions\n" << endl;
-// OF4 Update
         solidHeatSources.set
         (
             i,
@@ -40,7 +40,6 @@
             tmp<volVectorField> tkappaByCp =
                 thermos[i].Kappa()/thermos[i].Cp();
 
-// OF4 Update
             aniAlphas.set
             (
                 i,
@@ -68,7 +67,6 @@
             aniAlphas[i].primitiveFieldRef() =
                 coordinates[i].R().transformVector(tkappaByCp());
             aniAlphas[i].correctBoundaryConditions();
-// OF4 Update End
 
         }
 
@@ -81,7 +79,7 @@
             IOobject::AUTO_WRITE
         );
 
-        if (betavSolidIO.headerOk())
+        if (betavSolidIO.typeHeaderOk<volScalarField>(true))
         {
             betavSolid.set
             (
