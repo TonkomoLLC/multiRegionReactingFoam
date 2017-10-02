@@ -120,6 +120,8 @@ forAll(fluidRegions, i)
         ).ptr()
     );
 
+   reactionFluid[i].setTurbulence(turbulence[i]);
+
    Info<< "    Adding to Qdot\n" << endl;
    QdotFluid.set
    (
