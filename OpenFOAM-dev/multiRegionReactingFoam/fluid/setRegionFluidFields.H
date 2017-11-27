@@ -3,7 +3,8 @@
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields = fieldsFluid[i];
  
     combustionModels::psiCombustionModel& reaction = reactionFluid[i];
-    psiReactionThermo& thermo = reaction.thermo();
+//    psiReactionThermo& thermo = reaction.thermo();
+    psiReactionThermo& thermo = pThermoFluid[i]; //reaction.pThermo();
     PtrList<volScalarField>& Y = reactionFluid[i].thermo().composition().Y(); 
     thermo.validate(args.executable(), "h", "e");
     
@@ -15,7 +16,7 @@
     compressible::turbulenceModel& turb = turbulence[i];
  
     
-    reaction.setTurbulence(turb);
+//    reaction.setTurbulence(turb);
     
     volScalarField& K = KFluid[i];
     volScalarField& dpdt = dpdtFluid[i];
@@ -45,8 +46,7 @@
     {
         FatalIOErrorIn(args.executable().c_str(), thermo)
             << "Inert specie " << inertSpecie << " not found in available species "
-            << composition.species()
-            << exit(FatalIOError);
+            << composition.species() << exit(FatalIOError);
     }
 
     const label inertIndex(composition.species()[inertSpecie]);   

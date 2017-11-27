@@ -1,4 +1,5 @@
 // Initialise fluid field pointer lists
+PtrList<psiReactionThermo> pThermoFluid(fluidRegions.size());
 PtrList<combustionModels::psiCombustionModel> reactionFluid(fluidRegions.size());
 PtrList<volScalarField> rhoFluid(fluidRegions.size());
 PtrList<uniformDimensionedVectorField> gFluid(fluidRegions.size());
@@ -29,12 +30,12 @@ forAll(fluidRegions, i)
         << fluidRegions[i].name() << nl << endl;
         
         
-    Info<< "Creating reaction model and thermophysical properties\n" << endl;
+    Info<< "Reading thermophysical properties\n" << endl;
 
-    reactionFluid.set
+    pThermoFluid.set
     (
         i,
-          autoPtr<combustionModels::psiCombustionModel>(combustionModels::psiCombustionModel::New(fluidRegions[i])).ptr()
+          autoPtr<psiReactionThermo>(psiReactionThermo::New(fluidRegions[i])).ptr()
     );
 
     Info<< "    Adding to rhoFluid\n" << endl;
@@ -51,7 +52,9 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            reactionFluid[i].thermo().rho()
+//            reactionFluid[i].thermo().rho()
+            pThermoFluid[i].rho()
+
         )
     );
 
@@ -122,7 +125,9 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-           reactionFluid[i].thermo().Cp()
+//           reactionFluid[i].thermo().Cp()
+            pThermoFluid[i].Cp()
+
         )
     );
     
@@ -135,13 +140,30 @@ forAll(fluidRegions, i)
             rhoFluid[i],
             UFluid[i],
             phiFluid[i],
-            reactionFluid[i].thermo()
+//            reactionFluid[i].thermo()
+            pThermoFluid[i]
         ).ptr()
     );
     
-    reactionFluid[i].setTurbulence(turbulence[i]);
+    Info<< "Creating reaction model\n" << endl;
+ 
+    reactionFluid.set
+    (
+        i,
+          autoPtr<combustionModels::psiCombustionModel>
+          (
+          combustionModels::psiCombustionModel::New
+           (
+            pThermoFluid[i],
+            turbulence[i]          
+           )
+           )
+    );
 
-       
+
+//    reactionFluid[i].setTurbulence(turbulence[i]);
+
+      
     radiation.set
     (
         i,
