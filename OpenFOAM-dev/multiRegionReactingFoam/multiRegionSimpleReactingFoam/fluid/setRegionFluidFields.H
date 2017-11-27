@@ -3,7 +3,7 @@
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields = fieldsFluid[i];
  
     combustionModels::psiCombustionModel& reaction = reactionFluid[i];
-    psiReactionThermo& thermo = reaction.thermo();
+    psiReactionThermo& thermo = pThermoFluid[i];
     PtrList<volScalarField>& Y = reactionFluid[i].thermo().composition().Y(); 
     thermo.validate(args.executable(), "h", "e");
     
@@ -32,5 +32,15 @@
         initialMassFluid[i]
     );
 
-    word inertSpecie(thermo.lookup("inertSpecie"));
+    basicMultiComponentMixture& composition = reactionFluid[i].thermo().composition();	
+
+    const word inertSpecie(thermo.lookup("inertSpecie"));
+    if (!composition.species().found(inertSpecie))
+    {
+        FatalIOErrorIn(args.executable().c_str(), thermo)
+            << "Inert specie " << inertSpecie << " not found in available species "
+            << composition.species() << exit(FatalIOError);
+    }
+
+
     const bool frozenFlow = frozenFlowFluid[i];

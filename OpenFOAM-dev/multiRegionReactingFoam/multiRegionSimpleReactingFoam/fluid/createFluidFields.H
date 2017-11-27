@@ -1,4 +1,5 @@
 // Initialise fluid field pointer lists
+PtrList<psiReactionThermo> pThermoFluid(fluidRegions.size());
 PtrList<combustionModels::psiCombustionModel> reactionFluid(fluidRegions.size());
 PtrList<volScalarField> rhoFluid(fluidRegions.size());
 PtrList<volVectorField> UFluid(fluidRegions.size());
@@ -24,12 +25,12 @@ forAll(fluidRegions, i)
     Info<< "*** Reading fluid mesh thermophysical properties for region "
         << fluidRegions[i].name() << nl << endl;
 
-    Info<< "Creating reaction model\n" << endl;
+    Info<< "Reading thermophysical properties\n" << endl;
 
-    reactionFluid.set
+    pThermoFluid.set
     (
         i,
-        autoPtr<combustionModels::psiCombustionModel>(combustionModels::psiCombustionModel::New(fluidRegions[i])).ptr()
+          autoPtr<psiReactionThermo>(psiReactionThermo::New(fluidRegions[i])).ptr()
     );
 
 
@@ -48,7 +49,7 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            reactionFluid[i].thermo().rho()
+            pThermoFluid[i].rho()
         )
     );
 
@@ -116,35 +117,28 @@ forAll(fluidRegions, i)
             rhoFluid[i],
             UFluid[i],
             phiFluid[i],
-            reactionFluid[i].thermo()
+            pThermoFluid[i]
         ).ptr()
     );
 
-    reactionFluid[i].setTurbulence(turbulence[i]);
 
-   Info<< "    Adding to Qdot\n" << endl;
-   QdotFluid.set
-   (
+
+    Info<< "Creating reaction model\n" << endl;
+ 
+    reactionFluid.set
+    (
         i,
-        new volScalarField
-        (
-            IOobject
-            (
-                "Qdot",
-                runTime.timeName(),
-                fluidRegions[i],
-                IOobject::READ_IF_PRESENT,
-                IOobject::AUTO_WRITE
-            ),
-                fluidRegions[i],
-                dimensionedScalar
-            (
-                "Qdot",
-                dimEnergy/dimVolume/dimTime,
-                0
-            )
-        )
+          autoPtr<combustionModels::psiCombustionModel>
+          (
+          combustionModels::psiCombustionModel::New
+           (
+            pThermoFluid[i],
+            turbulence[i]          
+           )
+           )
     );
+
+
 
     radiation.set
     (
@@ -195,6 +189,31 @@ forAll(fluidRegions, i)
         i,
         new IOMRFZoneList(fluidRegions[i])
     );
+
+   Info<< "    Adding to Qdot\n" << endl;
+   QdotFluid.set
+   (
+        i,
+        new volScalarField
+        (
+            IOobject
+            (
+                "Qdot",
+                runTime.timeName(),
+                fluidRegions[i],
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+                fluidRegions[i],
+                dimensionedScalar
+            (
+                "Qdot",
+                dimEnergy/dimVolume/dimTime,
+                0
+            )
+        )
+    );
+
 
     Info<< "    Adding fvOptions\n" << endl;
 //OF4 Update
