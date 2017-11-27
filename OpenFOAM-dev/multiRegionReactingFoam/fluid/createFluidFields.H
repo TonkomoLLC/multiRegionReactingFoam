@@ -52,7 +52,6 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-//            reactionFluid[i].thermo().rho()
             pThermoFluid[i].rho()
 
         )
@@ -125,7 +124,6 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-//           reactionFluid[i].thermo().Cp()
             pThermoFluid[i].Cp()
 
         )
@@ -140,7 +138,6 @@ forAll(fluidRegions, i)
             rhoFluid[i],
             UFluid[i],
             phiFluid[i],
-//            reactionFluid[i].thermo()
             pThermoFluid[i]
         ).ptr()
     );
@@ -160,8 +157,6 @@ forAll(fluidRegions, i)
            )
     );
 
-
-//    reactionFluid[i].setTurbulence(turbulence[i]);
 
       
     radiation.set

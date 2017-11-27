@@ -3,8 +3,7 @@
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields = fieldsFluid[i];
  
     combustionModels::psiCombustionModel& reaction = reactionFluid[i];
-//    psiReactionThermo& thermo = reaction.thermo();
-    psiReactionThermo& thermo = pThermoFluid[i]; //reaction.pThermo();
+    psiReactionThermo& thermo = pThermoFluid[i]; 
     PtrList<volScalarField>& Y = reactionFluid[i].thermo().composition().Y(); 
     thermo.validate(args.executable(), "h", "e");
     
@@ -14,10 +13,7 @@
     surfaceScalarField& phi = phiFluid[i];
 
     compressible::turbulenceModel& turb = turbulence[i];
- 
-    
-//    reaction.setTurbulence(turb);
-    
+     
     volScalarField& K = KFluid[i];
     volScalarField& dpdt = dpdtFluid[i];
 
