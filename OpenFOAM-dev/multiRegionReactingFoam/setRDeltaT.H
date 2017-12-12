@@ -25,7 +25,7 @@ License
 
 {
     fvMesh& mesh = fluidRegions[0];
-    combustionModels::psiCombustionModel& reaction = reactionFluid[0];
+    CombustionModel<psiReactionThermo>& reaction = reactionFluid[0];
     surfaceScalarField& phi = phiFluid[0];
     volScalarField& rho = rhoFluid[0];    
     PtrList<volScalarField>& Y = reactionFluid[0].thermo().composition().Y();
