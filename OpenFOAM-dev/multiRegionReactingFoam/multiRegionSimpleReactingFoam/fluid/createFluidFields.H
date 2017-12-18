@@ -229,7 +229,7 @@ forAll(fluidRegions, i)
 			new multivariateSurfaceInterpolationScheme<scalar>::fieldTable 
 		);
 
-    basicMultiComponentMixture& composition = reactionFluid[i].thermo().composition();	
+    basicSpecieMixture& composition = reactionFluid[i].thermo().composition();	
 		
 	
 	forAll(composition.Y(), j)
