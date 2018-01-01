@@ -2,8 +2,7 @@
 OpenFOAM transient solver for laminar or turbulent fluid flow and solid heat conduction with conjugate heat transfer between solid and fluid regions, plus combustion with chemical reactions (psi thermo model)
 
 Notes
-
-1. Compiles with OpenFOAM 4.0 and OpenFOAM-dev (as of 5-Oct-16)
+1. OpenFOAM-v1706 solver also compiles with OpenFOAM-v1712
 2. Release includes transient and steady state solvers (multiRegionReactingFoam and multiRegionSimpleReactingFoam)
 3. Unsteady state solver benchmarked against DETCHEM, FLUENT and reactingFoam.
 4. The main difference with chtMultiRegionReactingFoam is the form of PEqn.H.  PEqn in chtMultiRegionReactingFoam
