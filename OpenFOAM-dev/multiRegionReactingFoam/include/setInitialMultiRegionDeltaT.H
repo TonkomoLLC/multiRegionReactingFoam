@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,7 +22,7 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Global
-    setInitialMultiRegionDeltaT
+    setInitialDeltaT
 
 Description
     Set the initial timestep for the CHT MultiRegion solver.
@@ -31,16 +31,16 @@ Description
 
 if (adjustTimeStep)
 {
-    if ((runTime.timeIndex() == 0) && ((CoNum > SMALL) || (DiNum > SMALL)))
+    if ((runTime.timeIndex() == 0) && ((CoNum > small) || (DiNum > small)))
     {
-        if (CoNum < SMALL)
+        if (CoNum < small)
         {
-            CoNum = SMALL;
+            CoNum = small;
         }
 
-        if (DiNum < SMALL)
+        if (DiNum < small)
         {
-            DiNum = SMALL;
+            DiNum = small;
         }
 
         runTime.setDeltaT
@@ -48,7 +48,7 @@ if (adjustTimeStep)
             min
             (
                 min(maxCo/CoNum, maxDi/DiNum)*runTime.deltaT().value(),
-                min(runTime.deltaTValue(), maxDeltaT)
+                maxDeltaT
             )
         );
         Info<< "deltaT = " <<  runTime.deltaT().value() << endl;
