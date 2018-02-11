@@ -17,8 +17,11 @@ if (transonic)
         fvc::interpolate(psi)
        *(
             fvc::flux(HbyA)
-          + rhorAUf*fvc::ddtCorr(rho, U, phi)/fvc::interpolate(rho)
-        )
+          + MRF.zeroFilter
+            (
+                rhorAUf*fvc::ddtCorr(rho, U, phi)/fvc::interpolate(rho)
+            )        
+         )
     );
 
     MRF.makeRelative(fvc::interpolate(psi), phid);
@@ -64,7 +67,7 @@ else
         "phiHbyA",
         (
             fvc::flux(rho*HbyA)
-          + rhorAUf*fvc::ddtCorr(rho, U, phi)
+          + MRF.zeroFilter(rhorAUf*fvc::ddtCorr(rho, U, phi))
         )
     );
 

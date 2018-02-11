@@ -17,11 +17,14 @@ if (transonic)
         fvc::interpolate(psi)
        *(
             fvc::flux(HbyA)
-          + fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
-           /fvc::interpolate(rho)
+          + MRF.zeroFilter
+            (
+                fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
+               /fvc::interpolate(rho)
+            )
         )
     );
-
+    
     MRF.makeRelative(fvc::interpolate(psi), phid);
 
     surfaceScalarField phic
@@ -75,7 +78,7 @@ else
         "phiHbyA",
         (
             fvc::flux(rho*HbyA)
-          + fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi)
+          + MRF.zeroFilter(fvc::interpolate(rho*rAU)*fvc::ddtCorr(rho, U, phi))
         )
     );
 
