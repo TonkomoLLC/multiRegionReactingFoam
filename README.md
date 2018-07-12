@@ -13,3 +13,5 @@ Notes
    be chosen based on the characteristic times of the fluid assigned to region 0. Therefore, in a multiple fluid region
    application where LTS will be used, one may wish to assign the most "time step sensitive" fluid region to fluid region
    0 (e.g., by placing the name of this more sensitive fluid region first in under "fluid" in constant/regionProperties.
+6. The OpenFOAM-6 solver does not include a steady state solver (similar to the chtMultiRegionFoam solver in OpenFOAM-6).
+
