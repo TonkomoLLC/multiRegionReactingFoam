@@ -27,8 +27,8 @@
 
     fvOptions.constrain(EEqn);
 
-    EEqn.solve(mesh.solver(he.select(finalIter)));
-
+    EEqn.solve();
+    
     fvOptions.correct(he);
 
     thermo.correct();

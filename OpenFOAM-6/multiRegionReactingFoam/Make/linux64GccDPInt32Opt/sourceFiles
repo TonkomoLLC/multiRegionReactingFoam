@@ -1,0 +1,4 @@
+SOURCE = \
+fluid/compressibleCourantNo.C \
+solid/solidRegionDiffNo.C \
+multiRegionReactingFoam.C 

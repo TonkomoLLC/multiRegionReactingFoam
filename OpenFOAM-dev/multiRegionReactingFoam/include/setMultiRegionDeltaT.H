@@ -33,18 +33,18 @@ Description
 
 if (adjustTimeStep)
 {
-    if (CoNum == -great)
+    if (CoNum == -GREAT)
     {
-        CoNum = small;
+        CoNum = SMALL;
     }
 
-    if (DiNum == -great)
+    if (DiNum == -GREAT)
     {
-        DiNum = small;
+        DiNum = SMALL;
     }
 
-    scalar maxDeltaTFluid = maxCo/(CoNum + small);
-    scalar maxDeltaTSolid = maxDi/(DiNum + small);
+    scalar maxDeltaTFluid = maxCo/(CoNum + SMALL);
+    scalar maxDeltaTSolid = maxDi/(DiNum + SMALL);
 
     scalar deltaTFluid =
         min

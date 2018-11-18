@@ -31,16 +31,16 @@ Description
 
 if (adjustTimeStep)
 {
-    if ((runTime.timeIndex() == 0) && ((CoNum > small) || (DiNum > small)))
+    if ((runTime.timeIndex() == 0) && ((CoNum > SMALL) || (DiNum > SMALL)))
     {
-        if (CoNum < small)
+        if (CoNum < SMALL)
         {
-            CoNum = small;
+            CoNum = SMALL;
         }
 
-        if (DiNum < small)
+        if (DiNum < SMALL)
         {
-            DiNum = small;
+            DiNum = SMALL;
         }
 
         runTime.setDeltaT

@@ -50,7 +50,7 @@ License
     scalar maxCo(readScalar(pimpleDict.lookup("maxCo")));
 
     // Maximum time scale
-    scalar maxDeltaT(pimpleDict.lookupOrDefault<scalar>("maxDeltaT", great));
+    scalar maxDeltaT(pimpleDict.lookupOrDefault<scalar>("maxDeltaT", GREAT));
 
     // Smoothing parameter (0-1) when smoothing iterations > 0
     scalar rDeltaTSmoothingCoeff
@@ -102,8 +102,8 @@ License
         );
 
         Info<< "    Temperature = "
-            << 1/(gMax(rDeltaTT.field()) + vSmall) << ", "
-            << 1/(gMin(rDeltaTT.field()) + vSmall) << endl;
+            << 1/(gMax(rDeltaTT.field()) + VSMALL) << ", "
+            << 1/(gMin(rDeltaTT.field()) + VSMALL) << endl;
 
         rDeltaT.ref() = max(rDeltaT(), rDeltaTT);
     }
@@ -154,8 +154,8 @@ License
         if (foundY)
         {
             Info<< "    Composition = "
-                << 1/(gMax(rDeltaTY.field()) + vSmall) << ", "
-                << 1/(gMin(rDeltaTY.field()) + vSmall) << endl;
+                << 1/(gMax(rDeltaTY.field()) + VSMALL) << ", "
+                << 1/(gMin(rDeltaTY.field()) + VSMALL) << endl;
 
             rDeltaT.ref() = max(rDeltaT(), rDeltaTY);
         }
