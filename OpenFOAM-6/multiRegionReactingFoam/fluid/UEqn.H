@@ -16,7 +16,7 @@ UEqn.relax();
 
 fvOptions.constrain(UEqn);
 
-if (momentumPredictor)
+if (pimple.momentumPredictor())
 {
     solve(UEqn == -fvc::grad(p));
 

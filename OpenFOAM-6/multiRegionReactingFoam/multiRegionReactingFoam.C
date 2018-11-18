@@ -43,7 +43,6 @@ Description
 #include "turbulentFluidThermoModel.H"
 #include "fixedGradientFvPatchFields.H"
 #include "regionProperties.H"
-#include "pimpleControl.H"
 #include "pressureControl.H"
 #include "compressibleCourantNo.H"
 #include "solidRegionDiffNo.H"
@@ -55,6 +54,7 @@ Description
 #include "multivariateScheme.H"
 #include "fvcSmooth.H"
 #include "localEulerDdtScheme.H"
+#include "pimpleMultiRegionControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -71,8 +71,8 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
 
-    pimpleControl pimple(fluidRegions[0]);
-
+    pimpleMultiRegionControl pimples(fluidRegions, solidRegions);
+    #include "createFluidPressureControls.H"
     #include "initContinuityErrs.H"
     #include "createTimeControls.H"
     #include "readSolidTimeControls.H"
@@ -91,12 +91,11 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
     
-    while (runTime.run())
+    while (pimples.run(runTime))
     {
 //        #include "createTimeControls.H"
         #include "readTimeControls.H"
         #include "readSolidTimeControls.H"
-        #include "readPIMPLEControls.H"
 
         if (LTS)
         {
@@ -114,19 +113,15 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
         
-                // --- PIMPLE loop
-        for (int oCorr=0; oCorr<nOuterCorr; oCorr++)
+        // --- PIMPLE loop
+        while (pimples.loop())
         {
-            bool finalIter = oCorr == nOuterCorr-1;
-
             forAll(fluidRegions, i)
             {
                 Info<< "\nSolving for fluid region "
                     << fluidRegions[i].name() << endl;
                 #include "setRegionFluidFields.H"
-                #include "readFluidMultiRegionPIMPLEControls.H"
                 #include "solveFluid.H"
-                rho = thermo.rho();
             }
 
             forAll(solidRegions, i)
@@ -134,10 +129,8 @@ int main(int argc, char *argv[])
                 Info<< "\nSolving for solid region "
                     << solidRegions[i].name() << endl;
                 #include "setRegionSolidFields.H"
-                #include "readSolidMultiRegionPIMPLEControls.H"
                 #include "solveSolid.H"
             }
-
         }
         
 

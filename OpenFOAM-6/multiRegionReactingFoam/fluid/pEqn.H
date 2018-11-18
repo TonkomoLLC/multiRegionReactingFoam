@@ -4,12 +4,12 @@ volScalarField rAU(1.0/UEqn.A());
 surfaceScalarField rhorAUf("rhorAUf", fvc::interpolate(rho*rAU));
 volVectorField HbyA(constrainHbyA(rAU*UEqn.H(), U, p));
 
-if (nCorr <= 1)
+if (pimple.nCorrPISO() <= 1)
 {
     tUEqn.clear();
 }
 
-if (transonic)
+if (pimple.transonic())
 {
     surfaceScalarField phid
     (
@@ -20,13 +20,13 @@ if (transonic)
           + MRF.zeroFilter
             (
                 rhorAUf*fvc::ddtCorr(rho, U, phi)/fvc::interpolate(rho)
-            )        
-         )
+            )
+        )
     );
 
     MRF.makeRelative(fvc::interpolate(psi), phid);
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -37,24 +37,9 @@ if (transonic)
             fvOptions(psi, p, rho.name())
         );
 
-//        pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
-          pEqn.solve
-            (
-                mesh.solver
-                (
-                    p.select
-                    (
-                        (
-                           oCorr == nOuterCorr-1
-                        && corr == nCorr-1
-                        && nonOrth == nNonOrthCorr
-                        )
-                    )
-                )
-            );
+        pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
 
-
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi == pEqn.flux();
         }
@@ -76,7 +61,7 @@ else
     // Update the pressure BCs to ensure flux consistency
     constrainPressure(p, rho, U, phiHbyA, rhorAUf, MRF);
 
-    for (int nonOrth=0; nonOrth<=nNonOrthCorr; nonOrth++)
+    while (pimple.correctNonOrthogonal())
     {
         fvScalarMatrix pEqn
         (
@@ -87,25 +72,9 @@ else
             fvOptions(psi, p, rho.name())
         );
 
-//        pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
+        pEqn.solve(mesh.solver(p.select(pimple.finalInnerIter())));
 
-          pEqn.solve
-            (
-                mesh.solver
-                (
-                    p.select
-                    (
-                        (
-                           oCorr == nOuterCorr-1
-                        && corr == nCorr-1
-                        && nonOrth == nNonOrthCorr
-                        )
-                    )
-                )
-            );
-
-
-        if (nonOrth == nNonOrthCorr)
+        if (pimple.finalNonOrthogonalIter())
         {
             phi = phiHbyA + pEqn.flux();
         }
@@ -113,9 +82,7 @@ else
 }
 
 #include "rhoEqn.H"
-//#include "compressibleContinuityErrs.H"
-#include "compressibleContinuityErrors.H"
-
+#include "compressibleContinuityErrs.H"
 
 // Explicitly relax pressure for momentum corrector
 p.relax();

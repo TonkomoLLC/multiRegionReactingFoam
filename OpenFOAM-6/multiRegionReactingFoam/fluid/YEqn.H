@@ -1,18 +1,28 @@
-tmp<fv::convectionScheme<scalar>> mvConvection
-(
-    fv::convectionScheme<scalar>::New
+tmp<fv::convectionScheme<scalar>> mvConvection(nullptr);
+
+if (Y.size())
+{
+    mvConvection = tmp<fv::convectionScheme<scalar>>
     (
-        mesh,
-        fields,
-        phi,
-        mesh.divScheme("div(phi,Yi)")
-    )
-);
+        fv::convectionScheme<scalar>::New
+        (
+            mesh,
+            fields,
+            phi,
+            mesh.divScheme("div(phi,Yi_h)")
+        )
+    );
+}
 
 {
     reaction.correct();
     Qdot = reaction.Qdot();
-    volScalarField Yt(0.0*Y[0]);
+    volScalarField Yt
+    (
+        IOobject("Yt", runTime.timeName(), mesh),
+        mesh,
+        dimensionedScalar("Yt", dimless, 0)
+    );
 
     forAll(Y, i)
     {
@@ -43,6 +53,9 @@ tmp<fv::convectionScheme<scalar>> mvConvection
         }
     }
 
-    Y[inertIndex] = scalar(1) - Yt;
-    Y[inertIndex].max(0.0);
+    if (Y.size())
+    {
+        Y[inertIndex] = scalar(1) - Yt;
+        Y[inertIndex].max(0.0);
+    }
 }
