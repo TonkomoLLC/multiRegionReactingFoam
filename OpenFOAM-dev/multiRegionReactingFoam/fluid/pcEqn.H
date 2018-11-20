@@ -49,7 +49,7 @@ if (pimple.transonic())
             fvOptions(psi, p, rho.name())
         );
 
-        pEqn.solve(pimple.finalInnerIter());
+        pEqn.solve();
 
         if (pimple.finalNonOrthogonalIter())
         {
@@ -89,7 +89,7 @@ else
             fvOptions(psi, p, rho.name())
         );
 
-        pEqn.solve(pimple.finalInnerIter());
+        pEqn.solve();
 
         if (pimple.finalNonOrthogonalIter())
         {
@@ -100,7 +100,6 @@ else
 
 #include "rhoEqn.H"
 #include "compressibleContinuityErrs.H"
-//#include "compressibleContinuityErrors.H"
 
 // Explicitly relax pressure for momentum corrector
 p.relax();

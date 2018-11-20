@@ -17,7 +17,7 @@
 
         fvOptions.constrain(hEqn);
 
-        hEqn.solve(mesh.solver(h.select(pimples.finalIter())));
+        hEqn.solve();
 
         fvOptions.correct(h);
     }
