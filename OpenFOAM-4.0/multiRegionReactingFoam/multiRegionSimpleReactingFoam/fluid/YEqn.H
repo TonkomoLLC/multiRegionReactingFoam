@@ -33,8 +33,7 @@ tmp<fv::convectionScheme<scalar> > mvConvection
                 fvOptions(rho, Yi)
             );
 
-           YiEqn.relax();
-           YiEqn.relax(mesh.equationRelaxationFactor("Yi"));
+            YiEqn.relax();
 
             fvOptions.constrain(YiEqn);
 
