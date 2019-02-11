@@ -7,7 +7,7 @@ PtrList<volScalarField> CpFluid(fluidRegions.size());
 PtrList<volVectorField> UFluid(fluidRegions.size());
 PtrList<surfaceScalarField> phiFluid(fluidRegions.size());
 PtrList<compressible::turbulenceModel> turbulence(fluidRegions.size());
-PtrList<radiation::radiationModel> radiation(fluidRegions.size());
+PtrList<radiationModel> radiation(fluidRegions.size());
 PtrList<volScalarField> KFluid(fluidRegions.size());
 PtrList<volScalarField> dpdtFluid(fluidRegions.size());
 PtrList<volScalarField> QdotFluid(fluidRegions.size());
@@ -162,7 +162,7 @@ forAll(fluidRegions, i)
     radiation.set
     (
         i,
-        radiation::radiationModel::New(reactionFluid[i].thermo().T())
+        radiationModel::New(pThermoFluid[i].T())
     );
 
     initialMassFluid[i] = fvc::domainIntegrate(rhoFluid[i]).value();
