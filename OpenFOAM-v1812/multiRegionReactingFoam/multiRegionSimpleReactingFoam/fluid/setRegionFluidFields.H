@@ -45,5 +45,5 @@
             << composition.species() << exit(FatalIOError);
     }
 
-    const label inertIndex(composition.species()[inertSpecie]);   
+//    const label inertIndex(composition.species()[inertSpecie]);   
     const bool frozenFlow = frozenFlowFluid[i];
