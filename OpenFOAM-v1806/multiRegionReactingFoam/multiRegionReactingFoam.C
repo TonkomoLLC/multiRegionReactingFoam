@@ -103,12 +103,11 @@ int main(int argc, char *argv[])
             #include "setRDeltaT.H"
         }
         else
- 
-          {
-              #include "compressibleMultiRegionCourantNo.H"
-              #include "solidRegionDiffusionNo.H"
-              #include "setMultiRegionDeltaT.H"
-          }
+        {
+            #include "compressibleMultiRegionCourantNo.H"
+            #include "solidRegionDiffusionNo.H"
+            #include "setMultiRegionDeltaT.H"
+        }
        
         runTime++;
 
