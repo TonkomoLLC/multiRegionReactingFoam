@@ -9,6 +9,9 @@ if (frozenFlow)
 }
 else
 {
+    p.storePrevIter();
+    rho.storePrevIter();
+
     if (oCorr == 0)
     {
         #include "rhoEqn.H"

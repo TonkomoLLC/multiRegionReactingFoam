@@ -9,6 +9,9 @@ if (frozenFlow)
 }
 else
 {
+    reactionFluid[i].thermo().p().storePrevIter();
+    rho.storePrevIter();
+
     if (oCorr == 0)
     {
         #include "rhoEqn.H"

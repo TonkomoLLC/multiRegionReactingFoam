@@ -3,7 +3,7 @@
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable fields = fieldsFluid[i];
  
     CombustionModel<psiReactionThermo>& reaction = reactionFluid[i];
-    psiReactionThermo& thermo = pThermoFluid[i]; 
+    psiReactionThermo& thermo = reaction.thermo();
     PtrList<volScalarField>& Y = reactionFluid[i].thermo().composition().Y(); 
     thermo.validate(args.executable(), "h", "e");
     
