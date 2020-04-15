@@ -15,7 +15,7 @@
             )
           : -dpdt
         )
-      - fvm::laplacian(turb.alphaEff(), he)
+      + thermophysicalTransport.divq(he)
      ==
         rho*(U&g)
       + rad.Sh(thermo, he)

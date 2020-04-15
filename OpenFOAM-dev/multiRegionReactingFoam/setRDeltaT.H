@@ -28,9 +28,9 @@ License
     CombustionModel<psiReactionThermo>& reaction = reactionFluid[0];
     surfaceScalarField& phi = phiFluid[0];
     volScalarField& rho = rhoFluid[0];    
-    PtrList<volScalarField>& Y = reactionFluid[0].thermo().composition().Y();
-    basicMultiComponentMixture& composition = reactionFluid[0].thermo().composition();	
-    psiReactionThermo& thermo = reaction.thermo();
+    PtrList<volScalarField>& Y = thermoFluid[0].composition().Y();
+    basicMultiComponentMixture& composition = thermoFluid[0].composition(); 	
+     psiReactionThermo& thermo = thermoFluid[0];
     
     const word inertSpecie(thermo.lookup("inertSpecie"));
     if (!composition.species().found(inertSpecie))

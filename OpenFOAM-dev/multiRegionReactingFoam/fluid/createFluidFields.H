@@ -1,12 +1,15 @@
 // Initialise fluid field pointer lists
-PtrList<psiReactionThermo> pThermoFluid(fluidRegions.size());
+PtrList<psiReactionThermo> thermoFluid(fluidRegions.size());
 PtrList<CombustionModel<psiReactionThermo>> reactionFluid(fluidRegions.size());
 PtrList<volScalarField> rhoFluid(fluidRegions.size());
 PtrList<uniformDimensionedVectorField> gFluid(fluidRegions.size());
 PtrList<volScalarField> CpFluid(fluidRegions.size());
 PtrList<volVectorField> UFluid(fluidRegions.size());
 PtrList<surfaceScalarField> phiFluid(fluidRegions.size());
-PtrList<compressible::turbulenceModel> turbulence(fluidRegions.size());
+PtrList<compressible::momentumTransportModel>
+    turbulenceFluid(fluidRegions.size());
+PtrList<compressible::thermophysicalTransportModel>
+    thermophysicalTransportFluid(fluidRegions.size());
 PtrList<radiationModel> radiation(fluidRegions.size());
 PtrList<volScalarField> KFluid(fluidRegions.size());
 PtrList<volScalarField> dpdtFluid(fluidRegions.size());
@@ -32,7 +35,7 @@ forAll(fluidRegions, i)
         
     Info<< "Reading thermophysical properties\n" << endl;
 
-    pThermoFluid.set
+    thermoFluid.set
     (
         i,
           autoPtr<psiReactionThermo>(psiReactionThermo::New(fluidRegions[i])).ptr()
@@ -52,7 +55,7 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            pThermoFluid[i].rho()
+            thermoFluid[i].rho()
 
         )
     );
@@ -124,21 +127,31 @@ forAll(fluidRegions, i)
                 IOobject::NO_READ,
                 IOobject::AUTO_WRITE
             ),
-            pThermoFluid[i].Cp()
+            thermoFluid[i].Cp()
 
         )
     );
     
-    Info<< "    Adding to turbulence\n" << endl;
-    turbulence.set
+    Info<< "    Adding to turbulenceFluid\n" << endl;
+    turbulenceFluid.set
     (
         i,
-        compressible::turbulenceModel::New
+        compressible::momentumTransportModel::New
         (
             rhoFluid[i],
             UFluid[i],
             phiFluid[i],
-            pThermoFluid[i]
+            thermoFluid[i]
+        ).ptr()
+    );
+
+    Info<< "    Adding to thermophysicalTransport\n" << endl;
+    thermophysicalTransportFluid.set
+    (
+        i,
+        compressible::thermophysicalTransportModel::New
+        (
+            turbulenceFluid[i]
         ).ptr()
     );
     
@@ -151,8 +164,8 @@ forAll(fluidRegions, i)
           (
           CombustionModel<psiReactionThermo>::New
            (
-            pThermoFluid[i],
-            turbulence[i]          
+            thermoFluid[i],
+            turbulenceFluid[i]          
            )
           )
     );
@@ -162,7 +175,7 @@ forAll(fluidRegions, i)
     radiation.set
     (
         i,
-        radiationModel::New(pThermoFluid[i].T())
+        radiationModel::New(thermoFluid[i].T())
     );
 
     initialMassFluid[i] = fvc::domainIntegrate(rhoFluid[i]).value();
@@ -252,19 +265,17 @@ forAll(fluidRegions, i)
 			new multivariateSurfaceInterpolationScheme<scalar>::fieldTable 
 		);
 
-    basicSpecieMixture& composition = reactionFluid[i].thermo().composition();	
-		
-	
-	forAll(composition.Y(), j)
-	{
-		    fieldsFluid[i].add(composition.Y()[j]);
-	}
+    forAll(thermoFluid[i].composition().Y(), j)
+    {
+        fieldsFluid[i].add(thermoFluid[i].composition().Y()[j]);
+    }
 
+    fieldsFluid[i].add(thermoFluid[i].he());
 
 		
     fieldsFluid[i].add(reactionFluid[i].thermo().he());
 
-    turbulence[i].validate();    
+    turbulenceFluid[i].validate();    
 }
 
 

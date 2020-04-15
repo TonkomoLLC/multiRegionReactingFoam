@@ -2,7 +2,7 @@
 
     CombustionModel<psiReactionThermo>& reaction = reactionFluid[i];
 
-    psiReactionThermo& thermo = pThermoFluid[i]; 
+    psiReactionThermo& thermo = thermoFluid[i]; 
     thermo.validate(args.executable(), "h", "e");
 
     basicMultiComponentMixture& composition = thermo.composition();
@@ -28,7 +28,10 @@
     surfaceScalarField& phi = phiFluid[i];
     volScalarField& Qdot = QdotFluid[i];
 
-    compressible::turbulenceModel& turb = turbulence[i];
+    compressible::thermophysicalTransportModel& thermophysicalTransport =
+        thermophysicalTransportFluid[i];
+
+    compressible::momentumTransportModel& turbulence = turbulenceFluid[i];
     volScalarField& K = KFluid[i];
     volScalarField& dpdt = dpdtFluid[i];
 
