@@ -3,8 +3,8 @@ OpenFOAM transient solver for laminar or turbulent fluid flow and solid heat con
 
 Notes
 1. OpenFOAM-v1706 solver also compiles with OpenFOAM-v1712
-2. OpenFOAM-v1806 solver also compiles with OpenFOAM-v1906
-3. Release includes transient and steady state solvers (multiRegionReactingFoam and multiRegionSimpleReactingFoam)
+2. OpenFOAM-v1806 solver also compiles with OpenFOAM-v1812, 1906, 1912, 2006, 2012, and 2106. The steady state solver may not work with latter versions of ESI's OpenFOAM fork.
+3. Releases for OpenFOAM-4 and OpenFOAM-5 includes transient and steady state solvers (multiRegionReactingFoam and multiRegionSimpleReactingFoam). The steady state solvers are not included in releases for later versions of OpenFOAM.
 4. Unsteady state solver benchmarked against DETCHEM, FLUENT and reactingFoam.
 5. The main difference with chtMultiRegionReactingFoam is the form of PEqn.H.  PEqn in chtMultiRegionReactingFoam
    is based on PEqn from chtMultiRegionFoam, while PEqn in multiRegionReactingFoam is based on reactingFoam. One may find
@@ -15,4 +15,4 @@ Notes
    application where LTS will be used, one may wish to assign the most "time step sensitive" fluid region to fluid region
    0 (e.g., by placing the name of this more sensitive fluid region first in under "fluid" in constant/regionProperties.
 7. The OpenFOAM-6 solver does not include a steady state solver (similar to the chtMultiRegionFoam solver in OpenFOAM-6).
-
+8. The OpenFOAM-8 branch also includes chtMultiRegionFoamLTS, which is chtMultiRegionFoam for OpenFOAM-8 with the ability to use LTS (see the LTS notes above, since LTS is based on one fluid region - region0.
