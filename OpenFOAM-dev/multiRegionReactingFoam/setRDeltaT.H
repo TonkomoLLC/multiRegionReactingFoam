@@ -25,23 +25,23 @@ License
 
 {
     fvMesh& mesh = fluidRegions[0];
-    CombustionModel<psiReactionThermo>& reaction = reactionFluid[0];
+    combustionModel& reaction = reactionFluid[0];
     surfaceScalarField& phi = phiFluid[0];
     volScalarField& rho = rhoFluid[0];    
+    basicSpecieMixture& composition = thermoFluid[0].composition();
     PtrList<volScalarField>& Y = thermoFluid[0].composition().Y();
-    basicMultiComponentMixture& composition = thermoFluid[0].composition(); 	
-     psiReactionThermo& thermo = thermoFluid[0];
+    fluidReactionThermo& thermo = thermoFluid[0];
     
-    const word inertSpecie(thermo.lookup("inertSpecie"));
+    const word inertSpecie(thermo.properties().lookup("inertSpecie"));
     if (!composition.species().found(inertSpecie))
     {
-        FatalIOErrorIn(args.executable().c_str(), thermo)
+        FatalIOErrorIn(args.executable().c_str(), thermo.properties())
             << "Inert specie " << inertSpecie << " not found in available species "
             << composition.species()
             << exit(FatalIOError);
     }
     const label inertIndex(composition.species()[inertSpecie]);   
-
+    
     volScalarField& rDeltaT = trDeltaT.ref();
 
     const dictionary& pimpleDict = mesh.solutionDict().subDict("PIMPLE");

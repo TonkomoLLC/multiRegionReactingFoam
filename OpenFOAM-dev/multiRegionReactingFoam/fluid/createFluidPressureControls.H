@@ -1,16 +1,33 @@
-PtrList<pressureControl> pressureControlFluid(fluidRegions.size());
+PtrList<pressureReference> pressureReferenceFluid(fluidRegions.size());
 
+/*
 forAll(fluidRegions, i)
 {
-    pressureControlFluid.set
+    pressureReferenceFluid.set
     (
         i,
-        new pressureControl
+        new pressureReference
         (
-            reactionFluid[i].thermo().p(),
-            rhoFluid[i],
+            pFluid[i],
             pimples.pimple(i).dict(),
             false
         )
     );
+
+
+    hydrostaticInitialisation
+    (
+        pFluid[i],
+        thermoFluid[i].p(),
+        rhoFluid[i],
+        UFluid[i],
+        ghFluid[i],
+        ghfFluid[i],
+        pRefFluid[i],
+        thermoFluid[i],
+        pimples.pimple(i).dict()
+    );
+
 }
+*/
+

@@ -16,3 +16,4 @@ Notes
    0 (e.g., by placing the name of this more sensitive fluid region first in under "fluid" in constant/regionProperties.
 7. The OpenFOAM-6 solver does not include a steady state solver (similar to the chtMultiRegionFoam solver in OpenFOAM-6).
 8. The OpenFOAM-8 branch also includes chtMultiRegionFoamLTS, which is chtMultiRegionFoam for OpenFOAM-8 with the ability to use LTS (see the LTS notes above, since LTS is based on one fluid region - region0.
+9. The OpenFOAM-dev branch was last compiled with OpenFOAM-dev commit 78977d3, 2-Jul-21

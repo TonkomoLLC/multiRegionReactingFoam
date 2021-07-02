@@ -3,36 +3,36 @@
 
     fvScalarMatrix EEqn
     (
-        fvm::ddt(rho, he) + fvm::div(phi, he)
+        fvm::ddt(rho, he)
+      + (
+            mvConvection.valid()
+          ? mvConvection->fvmDiv(phi, he)
+          : fvm::div(phi, he)
+        )
       + fvc::ddt(rho, K) + fvc::div(phi, K)
       + (
             he.name() == "e"
-          ? fvc::div
-            (
-                fvc::absolute(phi/fvc::interpolate(rho), U),
-                p,
-                "div(phiv,p)"
-            )
+          ? mvConvection.valid()
+            ? mvConvection->fvcDiv(fvc::absolute(phi, rho, U), p/rho)
+            : fvc::div(fvc::absolute(phi, rho, U), p/rho)
           : -dpdt
         )
       + thermophysicalTransport.divq(he)
      ==
         rho*(U&g)
-      + rad.Sh(thermo, he)
-      + Qdot
-      + fvOptions(rho, he)
+      + reaction.Qdot()
+      + fvModels.source(rho, he)
     );
 
     EEqn.relax();
 
-    fvOptions.constrain(EEqn);
+    fvConstraints.constrain(EEqn);
 
     EEqn.solve();
-    
-    fvOptions.correct(he);
+
+    fvConstraints.constrain(he);
 
     thermo.correct();
-    rad.correct();
 
     Info<< "Min/max T:" << min(thermo.T()).value() << ' '
         << max(thermo.T()).value() << endl;

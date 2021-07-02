@@ -1,37 +1,21 @@
     const fvMesh& mesh = fluidRegions[i];
 
-    CombustionModel<psiReactionThermo>& reaction = reactionFluid[i];
+    combustionModel& reaction = reactionFluid[i];
 
-    psiReactionThermo& thermo = thermoFluid[i]; 
+    fluidReactionThermo& thermo = thermoFluid[i];
     thermo.validate(args.executable(), "h", "e");
 
-    basicMultiComponentMixture& composition = thermo.composition();
+    basicSpecieMixture& composition = thermo.composition();
     PtrList<volScalarField>& Y = composition.Y();
-
-    label inertIndex = -1;
-    if (Y.size())
-    {
-        const word inertSpecie(thermo.lookup("inertSpecie"));
-        if (!composition.species().found(inertSpecie))
-        {
-            FatalIOErrorIn(args.executable().c_str(), thermo)
-                << "Inert specie " << inertSpecie
-                << " not found in available species "
-                << composition.species()
-                << exit(FatalIOError);
-        }
-        inertIndex = composition.species()[inertSpecie];
-    }
 
     volScalarField& rho = rhoFluid[i];
     volVectorField& U = UFluid[i];
     surfaceScalarField& phi = phiFluid[i];
-    volScalarField& Qdot = QdotFluid[i];
-
-    compressible::thermophysicalTransportModel& thermophysicalTransport =
-        thermophysicalTransportFluid[i];
 
     compressible::momentumTransportModel& turbulence = turbulenceFluid[i];
+    fluidReactionThermophysicalTransportModel& thermophysicalTransport =
+        thermophysicalTransportFluid[i];
+
     volScalarField& K = KFluid[i];
     volScalarField& dpdt = dpdtFluid[i];
 
@@ -39,14 +23,15 @@
     const volScalarField& psi = thermo.psi();
 
     const dimensionedVector& g = gFluid[i];
-
+    
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable& fields =
         fieldsFluid[i];
 
-    radiationModel& rad = radiation[i];
-
     IOMRFZoneList& MRF = MRFfluid[i];
-    fv::options& fvOptions = fluidFvOptions[i];
+    Foam::fvModels& fvModels = fvModelsFluid[i];
+    Foam::fvConstraints& fvConstraints = fvConstraintsFluid[i];
+
+    #include "checkRadiationModel.H"
 
     const dimensionedScalar initialMass
     (
@@ -57,6 +42,10 @@
 
     pimpleNoLoopControl& pimple = pimples.pimple(i);
 
-    pressureControl& pressureControl = pressureControlFluid[i];
+    pressureReference& pressureReference = pressureReferenceFluid[i];
 
     scalar cumulativeContErr = cumulativeContErrs[i];
+
+    // This solver does not support moving mesh but it uses the pressure
+    // equation of one which does, so we need a dummy face-momentum field
+    autoPtr<surfaceVectorField> rhoUf(nullptr);

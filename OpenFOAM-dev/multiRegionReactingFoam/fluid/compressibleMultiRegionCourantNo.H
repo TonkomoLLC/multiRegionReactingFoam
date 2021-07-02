@@ -1,4 +1,4 @@
-    scalar CoNum = -GREAT;
+    scalar CoNum = -great;
 
     forAll(fluidRegions, regionI)
     {
@@ -14,19 +14,3 @@
             CoNum
         );
     }
-/*
-    forAll (porousFluidRegions, porousI)
-    {
-        CoNum = max
-        (
-            compressibleCourantNo
-            (
-                porousFluidRegions[porousI],
-                runTime,
-                rhoPorous[porousI],
-                phiPorous[porousI]
-            ),
-            CoNum
-        );
-    }
-*/
