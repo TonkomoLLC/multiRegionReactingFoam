@@ -13,7 +13,6 @@ PtrList<psiReactionThermophysicalTransportModel>
 PtrList<radiationModel> radiation(fluidRegions.size());
 PtrList<volScalarField> KFluid(fluidRegions.size());
 PtrList<volScalarField> dpdtFluid(fluidRegions.size());
-PtrList<volScalarField> QdotFluid(fluidRegions.size());
 
 List<scalar> initialMassFluid(fluidRegions.size());
 List<bool> frozenFlowFluid(fluidRegions.size(), false);
@@ -207,31 +206,6 @@ forAll(fluidRegions, i)
             )
         )
     );
-
-   Info<< "    Adding to Qdot\n" << endl;
-   QdotFluid.set
-   (
-        i,
-        new volScalarField
-        (
-            IOobject
-            (
-                "Qdot",
-                runTime.timeName(),
-                fluidRegions[i],
-                IOobject::READ_IF_PRESENT,
-                IOobject::AUTO_WRITE
-            ),
-                fluidRegions[i],
-                dimensionedScalar
-            (
-                "Qdot",
-                dimEnergy/dimVolume/dimTime,
-                0
-            )
-        )
-    );
-
 
     const dictionary& pimpleDict =
         fluidRegions[i].solutionDict().subDict("PIMPLE");
