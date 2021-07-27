@@ -13,6 +13,7 @@ PtrList<compressible::momentumTransportModel>
 PtrList<fluidReactionThermophysicalTransportModel>
     thermophysicalTransportFluid(fluidRegions.size());
 PtrList<combustionModel> reactionFluid(fluidRegions.size());
+PtrList<volScalarField> p_rghFluid(fluidRegions.size());
 PtrList<volScalarField> KFluid(fluidRegions.size());
 PtrList<volScalarField> dpdtFluid(fluidRegions.size());
 PtrList<multivariateSurfaceInterpolationScheme<scalar>::fieldTable>
@@ -24,6 +25,7 @@ PtrList<IOMRFZoneList> MRFfluid(fluidRegions.size());
 PtrList<Foam::fvModels> fvModelsFluid(fluidRegions.size());
 PtrList<fvConstraints> fvConstraintsFluid(fluidRegions.size());
 
+//LTS
 #include "createRDeltaT.H"
 
 // Populate fluid field pointer lists
@@ -143,6 +145,29 @@ forAll(fluidRegions, i)
         )
     );
 
+    dimensionedScalar ghRef(- mag(gFluid[i])*hRefFluid[i]);
+
+    Info<< "    Adding to ghFluid\n" << endl;
+    ghFluid.set
+    (
+        i,
+        new volScalarField
+        (
+            "gh",
+            (gFluid[i] & fluidRegions[i].C()) - ghRef
+        )
+    );
+
+    Info<< "    Adding to ghfFluid\n" << endl;
+    ghfFluid.set
+    (
+        i,
+        new surfaceScalarField
+        (
+            "ghf",
+            (gFluid[i] & fluidRegions[i].Cf()) - ghRef
+        )
+    );
 
     Info<< "    Adding to turbulenceFluid\n" << endl;
     turbulenceFluid.set
@@ -174,6 +199,25 @@ forAll(fluidRegions, i)
         i,
         combustionModel::New(thermoFluid[i], turbulenceFluid[i])
     );
+
+    p_rghFluid.set
+    (
+        i,
+        new volScalarField
+        (
+            IOobject
+            (
+                "p_rgh",
+                runTime.timeName(),
+                fluidRegions[i],
+                IOobject::MUST_READ,
+                IOobject::AUTO_WRITE
+            ),
+            fluidRegions[i]
+        )
+    );
+
+    fluidRegions[i].setFluxRequired(p_rghFluid[i].name());
 
     initialMassFluid[i] = fvc::domainIntegrate(rhoFluid[i]).value();
 

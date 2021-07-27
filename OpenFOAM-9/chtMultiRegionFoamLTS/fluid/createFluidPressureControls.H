@@ -7,16 +7,15 @@ forAll(fluidRegions, i)
         i,
         new pressureReference
         (
-            thermoFluid[i].p(),
+            p_rghFluid[i],
             pimples.pimple(i).dict(),
             false
         )
     );
-}
-/*
+
     hydrostaticInitialisation
     (
-        pFluid[i],
+        p_rghFluid[i],
         thermoFluid[i].p(),
         rhoFluid[i],
         UFluid[i],
@@ -26,7 +25,4 @@ forAll(fluidRegions, i)
         thermoFluid[i],
         pimples.pimple(i).dict()
     );
-
 }
-*/
-

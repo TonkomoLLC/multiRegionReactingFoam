@@ -23,7 +23,6 @@ else
         fvModels.correct();
     }
 
-    Info << "Hello" << endl;
     #include "UEqn.H"
 
     if (pimple.thermophysics())

@@ -22,13 +22,13 @@
     volScalarField& p = thermo.p();
     const volScalarField& psi = thermo.psi();
 
-    /*
     volScalarField& p_rgh = p_rghFluid[i];
+
+    const dimensionedVector& g = gFluid[i];
     const dimensionedScalar& pRef = pRefFluid[i];
     const volScalarField& gh = ghFluid[i];
     const surfaceScalarField& ghf = ghfFluid[i];
-    */
-    const dimensionedVector& g = gFluid[i];
+
     multivariateSurfaceInterpolationScheme<scalar>::fieldTable& fields =
         fieldsFluid[i];
 
@@ -54,5 +54,3 @@
     // This solver does not support moving mesh but it uses the pressure
     // equation of one which does, so we need a dummy face-momentum field
     autoPtr<surfaceVectorField> rhoUf(nullptr);
-    
-
