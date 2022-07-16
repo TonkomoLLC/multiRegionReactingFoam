@@ -3,7 +3,7 @@ OpenFOAM transient solver for laminar or turbulent fluid flow and solid heat con
 
 Notes
 1. OpenFOAM-v1706 solver also compiles with OpenFOAM-v1712
-2. OpenFOAM-v1812 solver also compiles with OpenFOAM-v1906, v1912, v2006, v2012, and v2106.
+2. OpenFOAM-v1812 solver also compiles with OpenFOAM-v1906, v1912, v2006, v2012, v2106, v2112, and v2206.
 3. Releases for OpenFOAM-4 and OpenFOAM-5 includes transient and steady state solvers (multiRegionReactingFoam and multiRegionSimpleReactingFoam). The steady state solvers are not included in releases for later versions of OpenFOAM.
 4. Unsteady state solver benchmarked against DETCHEM, FLUENT and reactingFoam.
 5. The main difference with chtMultiRegionReactingFoam is the form of PEqn.H.  PEqn in chtMultiRegionReactingFoam
