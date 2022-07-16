@@ -13,7 +13,7 @@ if (!pimple.flow())
 }
 else
 {
-    if (!mesh.steady() && pimples.firstPimpleIter())
+    if (!mesh.schemes().steady() && pimples.firstPimpleIter())
     {
         #include "rhoEqn.H"
     }
@@ -43,7 +43,7 @@ else
         thermophysicalTransport.correct();
     }
 
-    if (!mesh.steady() && pimples.finalPimpleIter())
+    if (!mesh.schemes().steady() && pimples.finalPimpleIter())
     {
         rho = thermo.rho();
     }
