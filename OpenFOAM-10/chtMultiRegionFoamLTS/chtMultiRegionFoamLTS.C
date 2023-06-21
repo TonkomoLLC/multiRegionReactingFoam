@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2011-2021 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2022 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,10 +48,12 @@ Description
 #include "pressureReference.H"
 #include "hydrostaticInitialisation.H"
 
-//LTS
+// LTS
+#include "pimpleControl.H"
 #include "multivariateScheme.H"
 #include "fvcSmooth.H"
 #include "localEulerDdtScheme.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -74,21 +76,25 @@ int main(int argc, char *argv[])
     #include "solidRegionDiffusionNo.H"
     #include "setInitialMultiRegionDeltaT.H"
 
+    if (!LTS)
+    {
+        #include "compressibleMultiRegionCourantNo.H"
+        #include "setMultiRegionDeltaT.H"
+    }
+
     while (pimples.run(runTime))
     {
-        #include "readTimeControls.H"
+        //#include "readTimeControls.H"
+        #include "createTimeControls.H"
         #include "readSolidTimeControls.H"
 
-        if (LTS)
-        {
-            #include "setRDeltaT.H"
-        }
-        if (!LTS)
-        {
-            #include "compressibleMultiRegionCourantNo.H"
-            #include "solidRegionDiffusionNo.H"
-            #include "setMultiRegionDeltaT.H"
-        }
+       if (!LTS)
+       {
+          #include "compressibleMultiRegionCourantNo.H"
+          #include "solidRegionDiffusionNo.H"
+          #include "setMultiRegionDeltaT.H"
+       }
+
 
         runTime++;
 
@@ -117,6 +123,10 @@ int main(int argc, char *argv[])
                 }
                 forAll(fluidRegions, i)
                 {
+                    if (LTS)
+                    {
+                        #include "setRDeltaTRegion.H" //MULTIREGION LTS ADDITION
+                    }
                     Info<< "\nSolving for fluid region "
                         << fluidRegions[i].name() << endl;
                     #include "setRegionFluidFields.H"
@@ -125,6 +135,11 @@ int main(int argc, char *argv[])
             }
         }
 
+        runTime.write();
+
+        Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"
+            << nl << endl;
     }
 
     Info<< "End\n" << endl;

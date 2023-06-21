@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2013-2016 OpenFOAM Foundation
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) 2013-2022 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,116 +24,83 @@ License
 \*---------------------------------------------------------------------------*/
 
 {
-    fvMesh& mesh = fluidRegions[0];
-    combustionModel& reaction = reactionFluid[0];
-    surfaceScalarField& phi = phiFluid[0];
-    volScalarField& rho = rhoFluid[0];    
-    basicSpecieMixture& composition = thermoFluid[0].composition();
-    PtrList<volScalarField>& Y = thermoFluid[0].composition().Y();
-    fluidReactionThermo& thermo = thermoFluid[0];
-    
-    label inertIndex = -1;
-    bool foundInert = false;
-    word inertSpecie;
-    if (Y.size())
-    {
-        if (thermo.properties().found("inertSpecie"))
-        {
-            word inertSpecieTemp(thermo.properties().lookup("inertSpecie"));
-            inertSpecie = inertSpecieTemp;
-            inertIndex = composition.species()[inertSpecie];
-            foundInert = true;
-        }
-        else        
-        {
-            word inertSpecieTemp(thermo.properties().lookup("defaultSpecie"));
-            inertSpecie = inertSpecieTemp;
-            inertIndex = composition.species()[inertSpecie];
-            foundInert = true;
-        }
+//MULTI-REGION LTS EDITS
+    fvMesh& mesh = fluidRegions[i];
+    combustionModel& reaction = reactionFluid[i];
+    surfaceScalarField& phi = phiFluid[i];
+    volScalarField& rho = rhoFluid[i];    
+    fluidReactionThermo& thermo = thermoFluid[i];
+    basicSpecieMixture& composition = thermo.composition();    
+    PtrList<volScalarField>& Y = composition.Y();
+    volScalarField& trDeltaT = trDeltaTFluid[i];
+//END MULTI-REGION LTS EDITS
 
-        if (!foundInert)
-        {
-            FatalIOErrorIn(args.executable().c_str(), thermo.properties())
-                << "Inert specie" 
-                << " or Default Specie " << inertSpecie
-                << " not found in available species "
-                << composition.species()
-                << exit(FatalIOError);
-        }
-        
-    }
-    
-    volScalarField& rDeltaT = trDeltaT.ref();
+//MULTI-REGION LTS EDITS
+    volScalarField& rDeltaT = trDeltaT; //.ref();
+//END MULTI-REGION LTS EDITS
 
-    const dictionary& pimpleDict = pimples.pimple(0).dict();
-
-    // Maximum flow Courant number
-    scalar maxCo(readScalar(pimpleDict.lookup("maxCo")));
-
-    // Maximum time scale
-    scalar maxDeltaT(pimpleDict.lookupOrDefault<scalar>("maxDeltaT", GREAT));
-
-    // Smoothing parameter (0-1) when smoothing iterations > 0
-    scalar rDeltaTSmoothingCoeff
-    (
-        pimpleDict.lookupOrDefault<scalar>("rDeltaTSmoothingCoeff", 0.1)
-    );
-
-    // Damping coefficient (1-0)
-    scalar rDeltaTDampingCoeff
-    (
-        pimpleDict.lookupOrDefault<scalar>("rDeltaTDampingCoeff", 1.0)
-    );
-
-    // Maximum change in cell temperature per iteration
-    // (relative to previous value)
-    scalar alphaTemp(pimpleDict.lookupOrDefault("alphaTemp", 0.05));
-
-    // Maximum change in cell concentration per iteration
-    // (relative to reference value)
-    scalar alphaY(pimpleDict.lookupOrDefault("alphaY", 1.0));
+    const dictionary& pimpleDict = pimples.pimple(i).dict();
 
     Info<< "Time scales min/max:" << endl;
 
     // Cache old reciprocal time scale field
-    volScalarField rDeltaT0("rDeltaT0", rDeltaT);
+    const volScalarField rDeltaT0("rDeltaT0", rDeltaT);
 
     // Flow time scale
     {
+        // Maximum flow Courant number
+        const scalar maxCo(pimpleDict.lookup<scalar>("maxCo"));
+
         rDeltaT.ref() =
         (
             fvc::surfaceSum(mag(phi))()()
            /((2*maxCo)*mesh.V()*rho())
         );
 
-        // Limit the largest time scale
-        rDeltaT.max(1/maxDeltaT);
+        // Limit the largest time step
+        if (pimpleDict.found("maxDeltaT"))
+        {
+            rDeltaT.max(1/pimpleDict.lookup<scalar>("maxDeltaT"));
+        }
+
+        // Limit the smallest time step
+        if (pimpleDict.found("minDeltaT"))
+        {
+            rDeltaT.min(1/pimpleDict.lookup<scalar>("minDeltaT"));
+        }
 
         Info<< "    Flow        = "
             << 1/gMax(rDeltaT.primitiveField()) << ", "
             << 1/gMin(rDeltaT.primitiveField()) << endl;
     }
 
+    // Maximum change in cell temperature per iteration
+    // (relative to previous value)
+    const scalar alphaTemp(pimpleDict.lookupOrDefault("alphaTemp", 0.05));
+
     // Heat release rate time scale
     if (alphaTemp < 1)
     {
         volScalarField::Internal rDeltaTT
         (
-            mag(reaction.Qdot())/(alphaTemp*rho*reactionFluid[0].thermo().Cp()*reaction.thermo().T())
+            mag(reaction.Qdot())/(alphaTemp*rho*reactionFluid[i].thermo().Cp()*reaction.thermo().T())
         );
 
         Info<< "    Temperature = "
-            << 1/(gMax(rDeltaTT.field()) + VSMALL) << ", "
-            << 1/(gMin(rDeltaTT.field()) + VSMALL) << endl;
+            << 1/(gMax(rDeltaTT.field()) + vSmall) << ", "
+            << 1/(gMin(rDeltaTT.field()) + vSmall) << endl;
 
         rDeltaT.ref() = max(rDeltaT(), rDeltaTT);
     }
 
     // Reaction rate time scale
-    if (alphaY < 1)
+    if (pimpleDict.found("alphaY"))
     {
-        dictionary Yref(pimpleDict.subDict("Yref"));
+        // Maximum change in cell concentration per iteration
+        // (relative to reference value)
+        const scalar alphaY(pimpleDict.lookup<scalar>("alphaY"));
+
+        const dictionary Yref(pimpleDict.subDict("Yref"));
 
         volScalarField::Internal rDeltaTY
         (
@@ -144,27 +111,27 @@ License
                 mesh
             ),
             mesh,
-            dimensionedScalar("rDeltaTY", rDeltaT.dimensions(), 0)
+            dimensionedScalar(rDeltaT.dimensions(), 0)
         );
 
         bool foundY = false;
 
         forAll(Y, i)
         {
-            if (i != inertIndex && composition.active(i))
+            if (composition.solve(i))
             {
                 volScalarField& Yi = Y[i];
 
                 if (Yref.found(Yi.name()))
                 {
                     foundY = true;
-                    scalar Yrefi = readScalar(Yref.lookup(Yi.name()));
+                    scalar Yrefi = Yref.lookup<scalar>(Yi.name());
 
                     rDeltaTY.field() = max
                     (
                         mag
                         (
-                            reaction.R(Yi)().source()
+                           reaction.R(Yi)().source()
                            /((Yrefi*alphaY)*(rho*mesh.V()))
                         ),
                         rDeltaTY
@@ -176,8 +143,8 @@ License
         if (foundY)
         {
             Info<< "    Composition = "
-                << 1/(gMax(rDeltaTY.field()) + VSMALL) << ", "
-                << 1/(gMin(rDeltaTY.field()) + VSMALL) << endl;
+                << 1/(gMax(rDeltaTY.field()) + vSmall) << ", "
+                << 1/(gMin(rDeltaTY.field()) + vSmall) << endl;
 
             rDeltaT.ref() = max(rDeltaT(), rDeltaTY);
         }
@@ -189,8 +156,14 @@ License
         }
     }
 
-    // Update tho boundary values of the reciprocal time-step
+    // Update the boundary values of the reciprocal time-step
     rDeltaT.correctBoundaryConditions();
+
+    // Smoothing parameter (0-1) when smoothing iterations > 0
+    const scalar rDeltaTSmoothingCoeff
+    (
+        pimpleDict.lookupOrDefault<scalar>("rDeltaTSmoothingCoeff", 0.1)
+    );
 
     // Spatially smooth the time scale field
     if (rDeltaTSmoothingCoeff < 1)
@@ -203,10 +176,16 @@ License
     // - only increase at a fraction of old time scale
     if
     (
-        rDeltaTDampingCoeff < 1
+        pimpleDict.found("rDeltaTDampingCoeff")
      && runTime.timeIndex() > runTime.startTimeIndex() + 1
     )
     {
+        // Damping coefficient (1-0)
+        const scalar rDeltaTDampingCoeff
+        (
+            pimpleDict.lookup<scalar>("rDeltaTDampingCoeff")
+        );
+
         rDeltaT = max
         (
             rDeltaT,
@@ -214,7 +193,7 @@ License
         );
     }
 
-    // Update tho boundary values of the reciprocal time-step
+    // Update the boundary values of the reciprocal time-step
     rDeltaT.correctBoundaryConditions();
 
     Info<< "    Overall     = "

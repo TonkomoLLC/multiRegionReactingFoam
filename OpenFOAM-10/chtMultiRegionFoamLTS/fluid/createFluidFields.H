@@ -25,12 +25,42 @@ PtrList<IOMRFZoneList> MRFfluid(fluidRegions.size());
 PtrList<Foam::fvModels> fvModelsFluid(fluidRegions.size());
 PtrList<fvConstraints> fvConstraintsFluid(fluidRegions.size());
 
-//LTS
-#include "createRDeltaT.H"
+// MULTIREGION LTS
+PtrList<volScalarField> trDeltaTFluid(fluidRegions.size());
+bool LTS = fv::localEulerDdt::enabled(fluidRegions[0]);
+// END MULTIREGION LTS
 
 // Populate fluid field pointer lists
 forAll(fluidRegions, i)
 {
+// MULTIREGION LTS
+    if (LTS)
+    {
+        Info<< "Using LTS Region " << i << endl;
+    }
+
+    trDeltaTFluid.set
+    (
+        i,
+        new volScalarField
+        (
+            IOobject
+            (
+                fv::localEulerDdt::rDeltaTName,
+                runTime.timeName(),
+                fluidRegions[i],
+                IOobject::READ_IF_PRESENT,
+                IOobject::AUTO_WRITE
+            ),
+            fluidRegions[i],
+            dimensionedScalar("one", dimless/dimTime, 1),
+            zeroGradientFvPatchScalarField::typeName
+        )
+    );
+
+// END MULTIREGION LTS
+
+
     Info<< "*** Reading fluid mesh thermophysical properties for region "
         << fluidRegions[i].name() << nl << endl;
 
