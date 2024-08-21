@@ -1,6 +1,6 @@
 if (finalIter)
 {
-        mesh.data().setFinalIteration(true);
+    mesh.data().setFinalIteration(true);
 }
 
 {
@@ -35,5 +35,5 @@ if (finalIter)
 
 if (finalIter)
 {
-        mesh.data().setFinalIteration(false);
+    mesh.data().setFinalIteration(false);
 }
