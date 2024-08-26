@@ -23,23 +23,22 @@ EXE_INC = \
 
 EXE_LIBS = \
     -lfiniteVolume \
+    -lfvOptions \
+    -lmeshTools \
+    -lsampling \
     -lcompressibleTransportModels \
     -lfluidThermophysicalModels \
-    -lsolidThermo \
     -lspecie \
+    -lreactionThermophysicalModels \
+    -lsolidThermo \
     -lchemistryModel \
     -lODE \
-    -lmeshTools \
     -lcombustionModels \
     -lturbulenceModels \
     -lcompressibleTurbulenceModels \
+    -lthermoTools \
     -lradiationModels \
-    -lfvOptions \
     -lregionModels \
-    -lthermophysicalProperties \
-    -lreactionThermophysicalModels \
-    -lsampling
-
-
-    
+    -lregionFaModels \
+    -lfiniteArea    
    
